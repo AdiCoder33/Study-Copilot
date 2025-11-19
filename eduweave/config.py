@@ -35,12 +35,12 @@ class GenerationConfig:
     max_context_chars: int = 6000
     max_summary_chars: int = 4500
     max_mcq_chars: int = 5000
-    answer_model: str = "google/flan-t5-base"
-    summary_model: str = "google/flan-t5-base"
-    mcq_model: str = "google/flan-t5-base"
-    answer_max_tokens: int = 256
-    summary_max_tokens: int = 256
-    mcq_max_tokens: int = 256
+    answer_model: str = "meta-llama/Llama-3.2-3B-Instruct"
+    summary_model: str = "meta-llama/Llama-3.2-3B-Instruct"
+    mcq_model: str = "meta-llama/Llama-3.2-3B-Instruct"
+    answer_max_tokens: int = 300
+    summary_max_tokens: int = 350
+    mcq_max_tokens: int = 400
 
 
 @dataclass
