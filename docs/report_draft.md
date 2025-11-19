@@ -6,7 +6,7 @@
 ## 2. Tools / Frameworks
 - Python, Streamlit, FAISS, `pypdf`.
 - `sentence-transformers/all-MiniLM-L6-v2` for embeddings.
-- Hugging Face Inference API (e.g., `HuggingFaceH4/zephyr-7b-beta`) for Q&A, summaries, and MCQs.
+- Local `google/flan-t5-base` (via `transformers`) for Q&A, summaries, and MCQs.
 - Brief rationale for each choice (open weights, free-tier friendly, quick iteration).
 
 ## 3. Approach / Workflow Summary

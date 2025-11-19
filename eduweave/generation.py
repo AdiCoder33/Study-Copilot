@@ -4,48 +4,10 @@ from __future__ import annotations
 
 import json
 import re
-import os
 from typing import Any, Dict, List, Tuple
 
-from huggingface_hub import InferenceClient
-
 from .config import GenerationConfig
-
-
-def _build_client(model: str) -> InferenceClient:
-    token = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN")
-    return InferenceClient(model=model, token=token)
-
-
-def _chat_with_hf(model: str, system_prompt: str, user_prompt: str, temperature: float, max_tokens: int) -> str:
-    client = _build_client(model)
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt},
-    ]
-    try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-        blocks = response.choices[0].message.get("content", [])
-        text = "".join(block.get("text", "") for block in blocks)
-        if text:
-            return text.strip()
-    except Exception:
-        pass
-
-    prompt = f"<|system|>\n{system_prompt.strip()}\n<|user|>\n{user_prompt.strip()}\n<|assistant|>\n"
-    text = client.text_generation(
-        prompt,
-        max_new_tokens=max_tokens,
-        temperature=temperature,
-        do_sample=True,
-        return_full_text=False,
-    )
-    return text.strip()
+from .local_llm import get_text_generator
 
 
 def _clean_context(text: str, limit: int) -> str:
@@ -72,12 +34,11 @@ Produce a concise study summary with:
 - highlight critical formulas or definitions if present.
 Keep the tone friendly and academic."""
 
-    return _chat_with_hf(
-        config.summary_model,
-        "You write concise, structured study notes.",
-        prompt,
-        temperature or config.summary_temperature,
-        config.summary_max_tokens,
+    generator = get_text_generator(config.summary_model)
+    return generator.generate(
+        prompt="You write concise, structured study notes.\n" + prompt,
+        temperature=temperature or config.summary_temperature,
+        max_new_tokens=config.summary_max_tokens,
     )
 
 
@@ -108,12 +69,11 @@ Return valid JSON with this schema:
 ]
 Include varied concepts and avoid trivia."""
 
-    raw_output = _chat_with_hf(
-        config.mcq_model,
-        "You design rigorous but fair multiple-choice questions.",
-        prompt,
-        temperature or config.mcq_temperature,
-        config.mcq_max_tokens,
+    generator = get_text_generator(config.mcq_model)
+    raw_output = generator.generate(
+        prompt="You design rigorous but fair multiple-choice questions.\n" + prompt,
+        temperature=temperature or config.mcq_temperature,
+        max_new_tokens=config.mcq_max_tokens,
     )
 
     try:

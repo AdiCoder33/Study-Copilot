@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import io
-import os
 from typing import List
 
 import streamlit as st
@@ -39,33 +38,13 @@ def ensure_corpus_ready() -> bool:
     return True
 
 
-def ensure_hf_token() -> bool:
-    token = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN")
-    if token:
-        return True
-    st.warning(
-        "Add a free Hugging Face access token in the sidebar to run text generation models."
-    )
-    return False
-
-
 def sidebar() -> None:
     st.sidebar.header("Setup")
     st.sidebar.write(
-        "1. Paste your Hugging Face token (free tier works).\n"
-        "2. Upload PDFs.\n"
+        "1. Upload PDFs.\n"
+        "2. Tune chunk sizes / overlaps.\n"
         "3. Explore RAG Q&A, summaries, and MCQs."
     )
-    token_default = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN", "")
-    hf_token = st.sidebar.text_input(
-        "Hugging Face token",
-        value=token_default,
-        type="password",
-        help="Created at https://huggingface.co/settings/tokens - stored only for this session.",
-    )
-    if hf_token:
-        os.environ["HF_TOKEN"] = hf_token
-        os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_token
     st.sidebar.markdown("---")
     st.sidebar.caption("EduWeave prioritizes workflow clarity over flashy UI.")
 
@@ -154,8 +133,6 @@ def qa_tab() -> None:
         if not question.strip():
             st.warning("Enter a question first.")
             return
-        if not ensure_hf_token():
-            return
         try:
             retrieval_cfg = RetrievalConfig(
                 top_k=top_k,
@@ -202,8 +179,6 @@ def summary_tab() -> None:
         return
     temperature = st.slider("Summary temperature", 0.0, 0.8, APP_CONFIG.generation.summary_temperature, step=0.05)
     if st.button("Generate summary"):
-        if not ensure_hf_token():
-            return
         try:
             summary = generate_summary(st.session_state.corpus_text, APP_CONFIG.generation, temperature=temperature)
         except Exception as exc:
@@ -228,8 +203,6 @@ def mcq_tab() -> None:
     count = st.slider("Number of MCQs", 3, 15, 5)
     temperature = st.slider("MCQ temperature", 0.0, 1.0, APP_CONFIG.generation.mcq_temperature, step=0.05)
     if st.button("Generate MCQs"):
-        if not ensure_hf_token():
-            return
         try:
             questions, raw = generate_mcqs(
                 st.session_state.corpus_text,

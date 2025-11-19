@@ -35,12 +35,12 @@ class GenerationConfig:
     max_context_chars: int = 6000
     max_summary_chars: int = 4500
     max_mcq_chars: int = 5000
-    answer_model: str = "HuggingFaceH4/zephyr-7b-beta"
-    summary_model: str = "HuggingFaceH4/zephyr-7b-beta"
-    mcq_model: str = "HuggingFaceH4/zephyr-7b-beta"
-    answer_max_tokens: int = 512
-    summary_max_tokens: int = 512
-    mcq_max_tokens: int = 768
+    answer_model: str = "google/flan-t5-base"
+    summary_model: str = "google/flan-t5-base"
+    mcq_model: str = "google/flan-t5-base"
+    answer_max_tokens: int = 256
+    summary_max_tokens: int = 256
+    mcq_max_tokens: int = 256
 
 
 @dataclass
