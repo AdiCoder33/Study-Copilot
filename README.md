@@ -15,7 +15,7 @@ The emphasis is on workflow clarity and experimentation (chunks, retrieval top-k
 - Streamlit for the UI
 - `pypdf` for parsing PDFs
 - `sentence-transformers/all-MiniLM-L6-v2` for embeddings
-- `google/flan-t5-base` (downloaded locally via `transformers`) for generation
+- `google/gemma-2b-it` (downloaded locally via `transformers`) for generation
 - FAISS in-memory vector store
 
 ## Getting Started
@@ -26,7 +26,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Then launch:
+Then launch (the first run will download the Gemma weights locally via `transformers`):
 
 ```bash
 streamlit run app.py
@@ -35,7 +35,7 @@ streamlit run app.py
 ## Workflow Overview
 
 1. **Upload PDFs** - Text is extracted per page with `pypdf`, cleaned, chunked with adjustable size/overlap, and embedded via Sentence Transformers before building FAISS.
-2. **Ask Questions** - The Q&A tab retrieves the top-k chunks, constrains the local FLAN-T5 model with that context, and shows the retrieved snippets. A baseline "whole corpus" mode is available for comparison.
+2. **Ask Questions** - The Q&A tab retrieves the top-k chunks, constrains the local Gemma model with that context, and shows the retrieved snippets. A baseline "whole corpus" mode is available for comparison.
 3. **Summaries & MCQs** - Summaries use a structured prompt, while MCQs return JSON payloads rendered into readable quiz cards (with a raw output fallback if parsing fails).
 4. **Experiment Logging** - Optional controls append notes and parameter settings to `docs/experiments.md`, which later feeds the project report.
 

@@ -6,7 +6,7 @@
 
 2. **Solution Overview (30s)**
    - Show the Streamlit interface layout.
-   - Mention FAISS + Sentence Transformers + locally-downloaded FLAN-T5 as the core stack.
+   - Mention FAISS + Sentence Transformers + locally-downloaded Gemma 2B IT as the core stack.
 
 3. **Feature Walkthrough (~2 min)**
    - **Upload tab:** highlight PDF ingestion, chunk controls, experiment logging toggle.

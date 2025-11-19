@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Optional
 
-from transformers import pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 
 class LocalTextGenerator:
@@ -18,11 +18,17 @@ class LocalTextGenerator:
 
     def _load(self):
         if self._pipeline is None:
+            tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            model = AutoModelForCausalLM.from_pretrained(
+                self.model_name,
+                device_map="auto",
+                torch_dtype="auto",
+            )
             self._pipeline = pipeline(
-                "text2text-generation",
-                model=self.model_name,
-                tokenizer=self.model_name,
-                device=self.device if isinstance(self.device, int) else -1,
+                "text-generation",
+                model=model,
+                tokenizer=tokenizer,
+                device=0 if isinstance(self.device, int) else -1,
             )
         return self._pipeline
 
