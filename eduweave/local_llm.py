@@ -28,7 +28,6 @@ class LocalTextGenerator:
                 "text-generation",
                 model=model,
                 tokenizer=tokenizer,
-                device=0 if isinstance(self.device, int) else -1,
             )
         return self._pipeline
 

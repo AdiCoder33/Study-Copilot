@@ -35,9 +35,9 @@ class GenerationConfig:
     max_context_chars: int = 6000
     max_summary_chars: int = 4500
     max_mcq_chars: int = 5000
-    answer_model: str = "google/gemma-2b-it"
-    summary_model: str = "google/gemma-2b-it"
-    mcq_model: str = "google/gemma-2b-it"
+    answer_model: str = "microsoft/Phi-3-mini-4k-instruct"
+    summary_model: str = "microsoft/Phi-3-mini-4k-instruct"
+    mcq_model: str = "microsoft/Phi-3-mini-4k-instruct"
     answer_max_tokens: int = 256
     summary_max_tokens: int = 300
     mcq_max_tokens: int = 350

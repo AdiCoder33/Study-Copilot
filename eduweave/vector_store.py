@@ -7,6 +7,15 @@ from typing import Any, Dict, List, Optional
 
 import faiss
 import numpy as np
+
+try:  # Defensive import: some envs lazy-load AutoConfig which sentence-transformers expects
+    from transformers import AutoConfig as _  # noqa: F401
+except ImportError:
+    import transformers
+    from transformers.models.auto.configuration_auto import AutoConfig
+
+    setattr(transformers, "AutoConfig", AutoConfig)
+
 from sentence_transformers import SentenceTransformer
 
 

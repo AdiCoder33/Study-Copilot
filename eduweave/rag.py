@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 from .config import GenerationConfig, RetrievalConfig
 from .local_llm import get_text_generator
 from .vector_store import VectorStoreManager
+import re
 
 
 @dataclass
@@ -69,10 +70,16 @@ Answer in a single short paragraph that directly addresses the question:"""
     ]
 
     generator = get_text_generator(generation_cfg.answer_model)
-    answer = generator.generate(
+    raw_answer = generator.generate(
         prompt="\n".join([m["content"] for m in messages]),
         temperature=temperature or generation_cfg.answer_temperature,
         max_new_tokens=generation_cfg.answer_max_tokens,
     )
+    # Prefer the portion after an "Answer:" marker if the model echoed the prompt.
+    match = re.split(r"(?i)\\banswer\\s*:\\s*", raw_answer)
+    if len(match) > 1:
+        answer = match[-1].strip()
+    else:
+        answer = raw_answer.strip()
 
     return AnswerResponse(answer=answer, sources=hits, mode=mode)
