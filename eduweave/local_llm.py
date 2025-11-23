@@ -21,8 +21,9 @@ class LocalTextGenerator:
             tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
-                device_map="auto",
+                device_map={"": "cpu"},  # keep everything on CPU to avoid meta/offload issues
                 torch_dtype="auto",
+                low_cpu_mem_usage=True,
             )
             self._pipeline = pipeline(
                 "text-generation",

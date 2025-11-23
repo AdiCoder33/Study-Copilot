@@ -75,11 +75,26 @@ Answer in a single short paragraph that directly addresses the question:"""
         temperature=temperature or generation_cfg.answer_temperature,
         max_new_tokens=generation_cfg.answer_max_tokens,
     )
-    # Prefer the portion after an "Answer:" marker if the model echoed the prompt.
-    match = re.split(r"(?i)\\banswer\\s*:\\s*", raw_answer)
-    if len(match) > 1:
-        answer = match[-1].strip()
-    else:
-        answer = raw_answer.strip()
+    # Prefer the portion after the last "Answer:" marker if the model echoed the prompt.
+    parts = re.split(r"(?i)\banswer\s*:\s*", raw_answer)
+    answer_body = parts[-1].strip() if len(parts) > 1 else raw_answer.strip()
+
+    # Drop lines that look like echoed prompt/context.
+    cleaned_lines = []
+    for line in answer_body.splitlines():
+        if re.match(r"(?i)\s*(context|question)\s*:", line):
+            continue
+        if re.search(r"EduWeave|AI assistant|Avoid speculation|Keep responses concise", line, flags=re.IGNORECASE):
+            continue
+        cleaned_lines.append(line)
+    cleaned = " ".join(cleaned_lines).strip()
+
+    # Keep up to the first seven sentences to stay concise but informative.
+    sentences = re.split(r"(?<=[.!?])\s+", cleaned)
+    answer = " ".join(sentences[:7]).strip() if sentences else cleaned
+
+    # Fallback if the model echoed instructions instead of answering.
+    if not answer or "if the answer is missing" in answer.lower():
+        answer = "I cannot find the answer in the supplied notes."
 
     return AnswerResponse(answer=answer, sources=hits, mode=mode)
